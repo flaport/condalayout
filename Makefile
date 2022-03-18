@@ -1,7 +1,8 @@
 docker:
 	if [ ! -d klayoutgit ]; then git clone git@github.com:flaport/klayout klayoutgit; fi
 	rm -rf klayout && rsync -av ./klayoutgit/ ./klayout/
-	docker buildx build . -t kl
+	#docker buildx build . -t kl
+	docker build . -t kl
 
-dockerrun:
+rundocker:
 	docker run -it kl
