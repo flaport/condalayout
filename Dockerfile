@@ -9,11 +9,14 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     neovim xvfb htop rsync zip
 RUN mamba install -y libpython-static
 ADD klayout klayout
+
 WORKDIR klayout
 RUN ./build.sh -j8 -debug -noruby -nopython #|| true
+RUN mkdir -p ./pkg/bin ./pkg/lib && \
+    find ./bin-debug -type f | grep so | xargs -I {} cp {} ./pkg/lib/ && \
+    cp ./bin-debug/klayout ./pkg/bin/ && \
+    zip -r klayout.zip pkg
 RUN rsync -av bin-debug/ /usr/bin/
 RUN rsync -av bin-debug/ /usr/lib/
-RUN zip -r klayout.zip bin-debug
-
 RUN echo 'Xvfb $DISPLAY &' >> /root/.bashrc
 ENTRYPOINT ["bash"]
