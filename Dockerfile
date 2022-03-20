@@ -12,7 +12,7 @@ RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 RUN apt-get update && apt-get install --no-install-recommends --yes \
     build-essential zlib1g-dev qt5-default qt5-qmake libqt5svg5-dev \
     qtbase5-dev qttools5-dev qttools5-dev libqt5xmlpatterns5-dev \
-    qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools \
+    qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools git \
     neovim xvfb htop rsync zip
 RUN mamba install -y python=$PYTHON_VERSION libpython-static
 
