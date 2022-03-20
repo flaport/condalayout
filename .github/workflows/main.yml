@@ -20,6 +20,6 @@ jobs:
     - name: Login to DockerHub Registry
       run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
     - name: Build the tagged Docker image
-      run: docker build . --no-cache --pull -t flaport/condalayout:latest
+      run: docker build . --no-cache --pull -t flaport/condalayout:latest --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8
     - name: Push the tagged Docker image
       run: docker push flaport/condalayout:latest
