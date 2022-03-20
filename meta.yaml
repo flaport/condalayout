@@ -1,0 +1,32 @@
+{% set name = "klayout-gui" %}
+{% set version = "0.27.8" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  # https://github.com/flaport/condalayout/archive/refs/tags/v.2.5.8.zip
+  url: https://github.com/flaport/condalayout/releases/download/untagged-4a0a067abbdb260bd172/klayout.tar.gz
+  sha256: deffab7b287562d280b90d77ca6d30b3bd3aa577aac5fc08d0491c7e8ff15a2a
+  to: klayout.tar.gz
+
+build:
+  number: 0
+  script: "tar -zxvf klayout.tar.gz --directory={{ CONDA_PREFIX }}"
+
+requirements:
+  host:
+    - python
+  run:
+    - python
+    - qt
+
+about:
+  home: https://github.com/flaport/condalayout/
+  license: Apache2
+  summary: Conda + KLayout
+  description: Conda + KLayout
+  dev_url: https://github.com/flaport/condalayout/
+  doc_url: https://github.com/flaport/condalayout/
+  doc_source_url: https://github.com/flaport/condalayout/
