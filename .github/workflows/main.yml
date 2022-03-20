@@ -31,7 +31,7 @@ jobs:
     container:
       image: flaport/condalayout
     steps:
-      - name: release
+      - name: create release
         uses: actions/create-release@v1
         id: create_release
         env:
@@ -41,7 +41,7 @@ jobs:
           prerelease: true
           release_name: klayout v${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-      - name: upload tarball
+      - name: add tarball to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
