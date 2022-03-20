@@ -1,0 +1,25 @@
+name: main
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/main.yml"
+      - "docs/**"
+      - "*.md"
+      - ".git*"
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Login to DockerHub Registry
+      run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+    - name: Build the tagged Docker image
+      run: docker build . --no-cache --pull -t flaport/condalayout:latest
+    - name: Push the tagged Docker image
+      run: docker push flaport/condalayout:latest
