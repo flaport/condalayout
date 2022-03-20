@@ -2,6 +2,7 @@ FROM condaforge/mambaforge
 
 ARG WORKERS
 ARG PYTHON_VERSION
+ARG KLAYOUT_VERSION
 
 ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -15,7 +16,7 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     neovim xvfb htop rsync zip
 RUN mamba install -y python=$PYTHON_VERSION libpython-static
 
-ADD klayout klayout
+RUN git clone git@github.com:klayout/klayout --branch v$KLAYOUT_VERSION --depth 1
 WORKDIR klayout
 
 RUN ./build.sh -j$WORKERS -noruby
