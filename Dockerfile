@@ -21,7 +21,8 @@ RUN ./build.sh -j8 -noruby
 RUN mkdir -p klayout/bin klayout/lib && \
     rsync -av bin-release/ klayout/lib/ && \
     mv klayout/lib/klayout klayout/bin/_klayout && \
-    echo '#! /bin/sh\nexport LD_LIBRARY_PATH="$CONDA_PREFIX/lib"\n_klayout "$@"' > klayout/bin/klayout && \
+    mv klayout/lib/strm* klayout/bin/ && \
+    echo '#! /bin/sh\nexport LD_LIBRARY_PATH="$CONDA_PREFIX/lib"\nexec _klayout "$@"' > klayout/bin/klayout && \
     chmod u+x klayout/bin/klayout && \
     rsync -av klayout/ /opt/conda/
 
