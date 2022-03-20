@@ -17,21 +17,17 @@ ADD klayout klayout
 WORKDIR klayout
 
 RUN ./build.sh -j8 -noruby
-#-pylib $CONDA_PREFIX/lib/libpython$PYTHON_VERSION.so -pyinc $CONDA_PREFIX/include/python$PYTHON_VERSION
 
-RUN find ./bin-release/ -name "*so*" | xargs -I {} cp {} /usr/lib/ && \
-    cp ./bin-release/klayout /usr/bin/_klayout && \
-    echo '#! /bin/sh\nexport LD_LIBRARY_PATH="$CONDA_PREFIX/lib"\n_klayout "$@"' > /usr/bin/klayout && \
-    chmod +x /usr/bin/klayout
+RUN mkdir -p klayout/bin klayout/lib && \
+    rsync -av bin-release/ klayout/lib/ && \
+    mv klayout/lib/klayout klayout/bin/_klayout && \
+    echo '#! /bin/sh\nexport LD_LIBRARY_PATH="$CONDA_PREFIX/lib"\n_klayout "$@"' > klayout/bin/klayout && \
+    chmod u+x klayout/bin/klayout && \
+    rsync -av klayout/ /opt/conda/
 
-RUN mkdir -p pkg/bin pkg/lib && \
-    ldd $(which _klayout) 2> /dev/null | \
-        sed "s/^.*=> //g" | \
-        sed "s/ (.*//g" | \
-        grep -v "linux-vdso.so.1" | \
-        xargs -I {} cp {} pkg/lib/ && \
-    cp /usr/bin/klayout /usr/bin/_klayout pkg/bin/ && \
-    zip -r klayout.zip pkg
+WORKDIR /klayout/klayout
+RUN tar -czf ../klayout.tar.gz *
 
+WORKDIR /root
 RUN echo 'Xvfb $DISPLAY &' >> /root/.bashrc
 ENTRYPOINT ["bash"]

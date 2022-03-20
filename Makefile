@@ -1,11 +1,11 @@
 clean:
-	rm -rf klayout.zip
+	rm -rf klayout.tar.gz
 	rm -rf klayout
 	rm -rf pkg
 	rm -rf build-log.txt
 
 dist: docker
-	docker cp `docker create kl`:/klayout/klayout.zip ./
+	docker cp `docker create kl`:/klayout/klayout.tar.gz ./
 
 docker:
 	if [ ! -d klayoutgit ]; then git clone git@github.com:flaport/klayout klayoutgit; fi
