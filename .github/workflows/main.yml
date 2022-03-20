@@ -10,18 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 14400
     steps:
-    - uses: actions/checkout@v1
-    - name: login to dockerhub registry
-      run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
-    - name: build or pull docker image using git tag
-      run: |
-        if ! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
-          docker build . -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }};
-        fi
-    - name: tag docker image as latest
-      run: docker tag flaport/condalayout:${{ github.ref_name }} flaport/condalayout:latest
-    - name: push docker image
-      run: docker push flaport/condalayout:latest && docker push flaport/condalayout:${{ github.ref_name }}
+      - name: checkout
+        uses: actions/checkout@v1
+      - name: login to dockerhub registry
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+      - name: build or pull docker image using git tag
+        run: |
+          if ! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
+            docker build . -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }};
+          fi
+      - name: tag docker image as latest
+        run: docker tag flaport/condalayout:${{ github.ref_name }} flaport/condalayout:latest
+      - name: push docker image
+        run: docker push flaport/condalayout:latest && docker push flaport/condalayout:${{ github.ref_name }}
 
   release:
     runs-on: ubuntu-latest
@@ -29,13 +30,24 @@ jobs:
       - docker
     container:
       image: flaport/condalayout
-      volumes:
-        - ${{ github.workspace }}:/github/workspace
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
-      - name: Expose 'klayout.tar.gz' as artifact
-        uses: actions/upload-artifact@master
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          name: nbdev_test_nbs.log
-          path: /klayout/klayout.tar.gz
+          draft: true
+          prerelease: true
+          release_name: klayout v${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+      - name: upload tarball
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /klayout/klayout.tar.gz
+          asset_name: klayout.tar.gz
+          asset_content_type: application/gzip
+
