@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     neovim xvfb htop rsync zip
 RUN mamba install -y python=$PYTHON_VERSION libpython-static
 
-RUN git clone git@github.com:klayout/klayout --branch v$KLAYOUT_VERSION --depth 1
+RUN git clone https://github.com/klayout/klayout --branch v$KLAYOUT_VERSION --depth 1
 WORKDIR klayout
 
 RUN ./build.sh -j$WORKERS -noruby
