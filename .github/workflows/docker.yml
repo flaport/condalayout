@@ -10,11 +10,14 @@ jobs:
     timeout-minutes: 14400
     steps:
     - uses: actions/checkout@v1
-    - name: Login to DockerHub Registry
+    - name: login to dockerhub registry
       run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
-    - name: Build docker image using git tag
-      run: docker build . --pull -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }}
-    - name: Tag docker image as latest
+    - name: build or pull docker image using git tag
+      run: |
+        if ! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
+          docker build . -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }};
+        fi
+    - name: tag docker image as latest
       run: docker tag flaport/condalayout:${{ github.ref_name }} flaport/condalayout:latest
-    - name: Push docker image
+    - name: push docker image
       run: docker push flaport/condalayout:latest && docker push flaport/condalayout:${{ github.ref_name }}
