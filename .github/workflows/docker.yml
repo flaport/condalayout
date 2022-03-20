@@ -12,8 +12,9 @@ jobs:
     - uses: actions/checkout@v1
     - name: Login to DockerHub Registry
       run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
-    - name: Build the tagged Docker image
-      run: docker build . --no-cache -t flaport/condalayout:latest --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }} && \
-           docker build . --no-cache -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }}
-    - name: Push the tagged Docker image
+    - name: Build docker image using git tag
+      run: docker build . --pull -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }}
+    - name: Tag docker image as latest
+      run: docker tag flaport/condalayout:${{ github.ref_name }} flaport/condalayout:latest
+    - name: Push docker image
       run: docker push flaport/condalayout:latest && docker push flaport/condalayout:${{ github.ref_name }}
