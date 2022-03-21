@@ -30,7 +30,18 @@ RUN mkdir -p klayout/bin klayout/lib && \
     rsync -av klayout/ /opt/conda/
 
 WORKDIR /klayout/klayout
-RUN tar -czf ../klayout.tar.gz *
+ADD canonical_name.py /canonical_name.py
+RUN mkdir /klayout/klayout-gui
+RUN tar -czf "/klayout/klayout-gui/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n 0 -e tar.gz)" *
+
+WORKDIR /klayout/klayout-gui
+RUN echo "#! /bin/sh\ntar -zxf \"\$RECIPE_DIR/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n 0 -e tar.gz)\" --directory=\"\$PREFIX\"" > build.sh
+ADD meta.yaml meta.yaml
+RUN sed -i "s/path: \.\.\/klayout.tar.gz/path: \.\/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n 0 -e tar.gz)/g" meta.yaml
+RUN cat meta.yaml
+RUN conda install -y conda-build
+RUN conda build .
+RUN cp /opt/conda/conda-bld/linux-64/klayout-gui-* ./
 
 WORKDIR /root
 RUN echo 'Xvfb $DISPLAY &' >> /root/.bashrc
