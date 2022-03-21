@@ -46,7 +46,7 @@ RUN conda build . && rm meta.yaml build.sh
 # klayout.tar.bz2
 RUN mkdir /klayout/klayout-py
 WORKDIR /klayout/klayout-py
-RUN echo "#! /bin/sh\npip install --no-deps klayout==$KLAYOUT_VERSION" > build.sh
+RUN echo "#! /bin/sh\npip install --no-deps https://files.pythonhosted.org/packages/2f/f6/3489ecf80db79a879f088a5abf40c48b7a9c6641114609376ae777859cf8/klayout-0.27.8-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl" > build.sh && cat build.sh
 RUN echo "{% set name = \"klayout\" %}\n{% set version = \"$KLAYOUT_VERSION\" %}\n{% set python = \"py$(python -c 'import sys; print(f"{sys.version_info.major}{sys.version_info.minor}")')\" %}\n{% set build_number = \"$BUILD_NUMBER\" %}" > meta.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
 RUN conda build . && rm meta.yaml build.sh /meta-template.yaml
