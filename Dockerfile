@@ -15,7 +15,9 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     qtbase5-dev qttools5-dev qttools5-dev libqt5xmlpatterns5-dev \
     qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools git \
     neovim xvfb htop rsync zip
-RUN mamba install -y python=$PYTHON_VERSION libpython-static conda-build
+
+RUN mamba install -y python=$PYTHON_VERSION libpython-static conda-build anaconda-client
+RUN conda config --set anaconda_upload no
 
 RUN git clone https://github.com/klayout/klayout --branch v$KLAYOUT_VERSION --depth 1
 WORKDIR klayout

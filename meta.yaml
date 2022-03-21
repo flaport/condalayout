@@ -17,7 +17,7 @@ requirements:
 
 about:
   home: https://github.com/flaport/condalayout/
-  license: Apache2
+  license: GPLv3
   summary: Conda + KLayout
   description: Conda + KLayout
   dev_url: https://github.com/flaport/condalayout/
