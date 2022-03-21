@@ -2,11 +2,12 @@
 
 > Conda + KLayout
 
-An attempt to have
+An attempt to have enable a conda-install for [KLayout](https://klayout.de). Currently
+only targeting Linux and python 3.8.
+
+## Installation
 
 ```sh
-conda install klayout
-conda install klayout-gui
+conda install -c flaport klayout
+conda install -c flaport klayout-gui
 ```
-
-For now only targeting Linux.
