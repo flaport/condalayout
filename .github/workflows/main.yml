@@ -41,13 +41,22 @@ jobs:
           prerelease: true
           release_name: KLayout v${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-      - name: add tarball to release
+      - name: add gzip tarball to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/klayout.tar.gz
-          asset_name: klayout.tar.gz
-          asset_content_type: application/gzip
+          asset_path: /klayout/klayout-gui/klayout-gui-0.27.8-py38_0.tar.gz
+          asset_name: klayout-gui-0.27.8-py38_0.tar.gz
+          asset_content_type: application/x-gzip
+      - name: add bzip tarball to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /klayout/klayout-gui/klayout-gui-0.27.8-py38_0.tar.bz2
+          asset_name: klayout-gui-0.27.8-py38_0.tar.bz2
+          asset_content_type: application/x-bzip2
 
