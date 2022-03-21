@@ -3,6 +3,7 @@ FROM condaforge/mambaforge
 ARG WORKERS
 ARG PYTHON_VERSION
 ARG KLAYOUT_VERSION
+ARG BUILD_NUMBER
 
 ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -32,15 +33,17 @@ RUN mkdir -p klayout/bin klayout/lib && \
 WORKDIR /klayout/klayout
 ADD canonical_name.py /canonical_name.py
 RUN mkdir /klayout/klayout-gui
-RUN tar -czf "/klayout/klayout-gui/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n 0 -e tar.gz)" *
+RUN tar -czf "/klayout/klayout-gui/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n $BUILD_NUMBER -e tar.gz)" *
 
 WORKDIR /klayout/klayout-gui
-RUN echo "#! /bin/sh\ntar -zxf \"\$RECIPE_DIR/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n 0 -e tar.gz)\" --directory=\"\$PREFIX\"" > build.sh
-ADD meta.yaml meta.yaml
-RUN sed -i "s/path: \.\.\/klayout.tar.gz/path: \.\/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n 0 -e tar.gz)/g" meta.yaml
+RUN echo "#! /bin/sh\ntar -zxf \"\$RECIPE_DIR/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n $BUILD_NUMBER -e tar.gz)\" --directory=\"\$PREFIX\"" > build.sh
+ADD meta.yaml meta-template.yaml
+RUN echo "{% set name = \"klayout-gui\" %}\n{% set version = \"$KLAYOUT_VERSION\" %}\n{% set python = \"py$(python -c 'import sys; print(f"{sys.version_info.major}{sys.version_info.minor}")')\" %}\n{% set build_number = \"$BUILD_NUMBER\" %}" > meta.yaml
+RUN cat meta-template.yaml >> meta.yaml && rm meta-template.yaml
 RUN cat meta.yaml
 RUN conda install -y conda-build
 RUN conda build .
+RUN rm meta.yaml build.sh
 RUN cp /opt/conda/conda-bld/linux-64/klayout-gui-* ./
 
 WORKDIR /root

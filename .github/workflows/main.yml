@@ -17,7 +17,7 @@ jobs:
       - name: build or pull docker image using git tag
         run: |
           if ! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
-            docker build . -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }};
+            docker build . -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }} --build-arg BUILD_NUMBER=0;
           fi
       - name: tag docker image as latest
         run: docker tag flaport/condalayout:${{ github.ref_name }} flaport/condalayout:latest
