@@ -16,7 +16,7 @@ jobs:
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
       - name: build or pull docker image using git tag
         run: |
-          if true; then #! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
+          if ! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
             docker build . -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }} --build-arg BUILD_NUMBER=0;
           fi
       - name: tag docker image as latest
@@ -41,15 +41,6 @@ jobs:
           prerelease: false
           release_name: KLayout v${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-      - name: klayout-gui - add gzip tarball to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-gui-0.27.8-py38_0.tar.gz
-          asset_name: klayout-gui-0.27.8-py38_0.tar.gz
-          asset_content_type: application/x-gzip
       - name: klayout-gui - add bzip tarball to release
         uses: actions/upload-release-asset@v1
         env:
@@ -59,15 +50,6 @@ jobs:
           asset_path: /klayout/dist/klayout-gui-0.27.8-py38_0.tar.bz2
           asset_name: klayout-gui-0.27.8-py38_0.tar.bz2
           asset_content_type: application/x-bzip2
-      - name: klayout - add gzip tarball to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-0.27.8-py38_0.tar.gz
-          asset_name: klayout-0.27.8-py38_0.tar.gz
-          asset_content_type: application/x-gzip
       - name: klayout - add bzip tarball to release
         uses: actions/upload-release-asset@v1
         env:
