@@ -18,6 +18,8 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
 
 RUN mamba install -y python=$PYTHON_VERSION libpython-static conda-build anaconda-client
 RUN conda config --set anaconda_upload no
+ADD canonical_name.py /canonical_name.py
+ADD meta.yaml /meta-template.yaml
 
 RUN git clone https://github.com/klayout/klayout --branch v$KLAYOUT_VERSION --depth 1
 WORKDIR klayout
@@ -30,18 +32,28 @@ RUN mkdir -p klayout/bin klayout/lib && \
     mv klayout/lib/strm* klayout/bin/ && \
     rsync -av klayout/ /opt/conda/
 
-WORKDIR /klayout/klayout
-ADD canonical_name.py /canonical_name.py
+# klayout-gui.tar.bz2
 RUN mkdir /klayout/klayout-gui
+WORKDIR /klayout/klayout
 RUN tar -czf "/klayout/klayout-gui/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n $BUILD_NUMBER -e tar.gz)" *
-
 WORKDIR /klayout/klayout-gui
+RUN rm -rf /klayout/klayout
 RUN echo "#! /bin/sh\ntar -zxf \"\$RECIPE_DIR/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n $BUILD_NUMBER -e tar.gz)\" --directory=\"\$PREFIX\"" > build.sh
-ADD meta.yaml meta-template.yaml
 RUN echo "{% set name = \"klayout-gui\" %}\n{% set version = \"$KLAYOUT_VERSION\" %}\n{% set python = \"py$(python -c 'import sys; print(f"{sys.version_info.major}{sys.version_info.minor}")')\" %}\n{% set build_number = \"$BUILD_NUMBER\" %}" > meta.yaml
-RUN cat meta-template.yaml >> meta.yaml && rm meta-template.yaml && cat meta.yaml
+RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
 RUN conda build . && rm meta.yaml build.sh
-RUN cp /opt/conda/conda-bld/linux-64/klayout-gui-* ./
+
+# klayout.tar.bz2
+RUN mkdir /klayout/klayout-py
+WORKDIR /klayout/klayout-py
+RUN echo "#! /bin/sh\npip install --no-deps klayout==$KLAYOUT_VERSION" > build.sh
+RUN echo "{% set name = \"klayout\" %}\n{% set version = \"$KLAYOUT_VERSION\" %}\n{% set python = \"py$(python -c 'import sys; print(f"{sys.version_info.major}{sys.version_info.minor}")')\" %}\n{% set build_number = \"$BUILD_NUMBER\" %}" > meta.yaml
+RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
+RUN conda build . && rm meta.yaml build.sh /meta-template.yaml
+
+# copy builds into dist
+RUN mkdir /klayout/dist
+RUN cp /opt/conda/conda-bld/linux-64/klayout-* /klayout/dist
 
 WORKDIR /root
 RUN echo 'Xvfb $DISPLAY &' >> /root/.bashrc

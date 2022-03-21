@@ -2,8 +2,10 @@ package:
   name: "{{ name|lower }}"
   version: "{{ version }}"
 
+{% if name == "klayout-gui" %}
 source:
   path: ./{{ name }}-{{ version }}-{{ python }}_{{ build_number }}.tar.gz
+{% endif %}
 
 build:
   number: "{{ build_number }}"
