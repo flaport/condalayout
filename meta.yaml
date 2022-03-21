@@ -6,7 +6,7 @@ source:
   path: ./{{ name }}-{{ version }}-{{ python }}_{{ build_number }}.tar.gz
 
 build:
-  number: {{ build_number }}
+  number: "{{ build_number }}"
 
 requirements:
   host:
