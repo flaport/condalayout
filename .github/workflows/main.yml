@@ -41,25 +41,45 @@ jobs:
           prerelease: false
           release_name: KLayout v${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-      - name: add gzip tarball to release
+      - name: klayout-gui - add gzip tarball to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/klayout-gui/klayout-gui-0.27.8-py38_0.tar.gz
+          asset_path: /klayout/dist/klayout-gui-0.27.8-py38_0.tar.gz
           asset_name: klayout-gui-0.27.8-py38_0.tar.gz
           asset_content_type: application/x-gzip
-      - name: add bzip tarball to release
+      - name: klayout-gui - add bzip tarball to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/klayout-gui/klayout-gui-0.27.8-py38_0.tar.bz2
+          asset_path: /klayout/dist/klayout-gui-0.27.8-py38_0.tar.bz2
           asset_name: klayout-gui-0.27.8-py38_0.tar.bz2
+          asset_content_type: application/x-bzip2
+      - name: klayout - add gzip tarball to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /klayout/dist/klayout-0.27.8-py38_0.tar.gz
+          asset_name: klayout-0.27.8-py38_0.tar.gz
+          asset_content_type: application/x-gzip
+      - name: klayout - add bzip tarball to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /klayout/dist/klayout-0.27.8-py38_0.tar.bz2
+          asset_name: klayout-0.27.8-py38_0.tar.bz2
           asset_content_type: application/x-bzip2
       - name: login to anaconda.org
         run: anaconda login --username '${{ secrets.ANACONDA_USER }}' --password '${{ secrets.ANACONDA_PASSWORD }}'
-      - name: upload to anaconda.org
-        run: anaconda upload /klayout/klayout-gui/klayout-gui-0.27.8-py38_0.tar.bz2
+      - name: klayout-gui - upload to anaconda.org
+        run: anaconda upload /klayout/dist/klayout-gui-0.27.8-py38_0.tar.bz2
+      - name: klayout - upload to anaconda.org
+        run: anaconda upload /klayout/dist/klayout-0.27.8-py38_0.tar.bz2
