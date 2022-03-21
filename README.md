@@ -2,7 +2,7 @@
 
 > Conda + KLayout
 
-An attempt to have enable a conda-install for [KLayout](https://klayout.de). Currently
+An attempt to enable a conda-install for [KLayout](https://klayout.de). Currently
 only targeting Linux and python 3.8.
 
 ## Installation
