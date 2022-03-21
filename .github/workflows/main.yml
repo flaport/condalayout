@@ -16,7 +16,7 @@ jobs:
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
       - name: build or pull docker image using git tag
         run: |
-          if ! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
+          if true; then #! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
             docker build . -t flaport/condalayout:${{ github.ref_name }} --build-arg WORKERS=2 --build-arg PYTHON_VERSION=3.8 --build-arg KLAYOUT_VERSION=${{ github.ref_name }} --build-arg BUILD_NUMBER=0;
           fi
       - name: tag docker image as latest
