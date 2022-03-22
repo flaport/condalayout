@@ -41,7 +41,7 @@ RUN ./build.sh -j$WORKERS -noruby
 
 # extract build
 RUN mkdir -p _klayout-gui/bin && \
-    mb bin-release _klayout-gui/lib && \
+    mv bin-release _klayout-gui/lib && \
     mv _klayout-gui/lib/klayout _klayout-gui/bin/ && \
     mv _klayout-gui/lib/strm* _klayout-gui/bin/
 
