@@ -8,9 +8,9 @@ ARG WORKERS
 ARG KLAYOUT_SEMVER
 ARG BUILD_NUMBER
 ARG PYTHON_SEMVER
-RUN export PYTHON_PYVER = $(echo PYTHON_SEMVER | sed "s/\(^[0-9]\+\)\.\([0-9]\+\)\..*/\1\2/g") # 3.8.2 -> 38
-RUN export BUILD_SUFFIX = "$KLAYOUT_SEMVER-$PYTHON_PYVER_$BUILD_NUMBER"
-RUN export KLAYOUT_PYPI_LINK=$(cat /klayout-pypi-links.txt | grep manylinux | grep $KLAYOUT_SEMVER | grep $PYTHON_PYVER | head -1) && [ ! -z "$KLAYOUT_PYPI_LINK" ]
+ARG $PYTHON_PYVER
+ARG BUILD_SUFFIX
+ARG KLAYOUT_PYPI_LINK
 
 RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 RUN apt-get update && apt-get install --no-install-recommends --yes \
@@ -49,7 +49,7 @@ RUN printf "\
 {% set name = \"klayout-gui\" %}\n\
 {% set version = \"$KLAYOUT_SEMVER\" %}\n\
 {% set build_number = \"$BUILD_NUMBER\" %}\n\
-{% set path = \"klayout-gui-$BUILD_SUFFIX.tar.gz\"}
+{% set path = \"klayout-gui-$BUILD_SUFFIX.tar.gz\"}\n\
 " > meta.yaml
 ADD meta-template.yaml /meta-template.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
