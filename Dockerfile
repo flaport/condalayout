@@ -8,9 +8,19 @@ ARG WORKERS
 ARG KLAYOUT_SEMVER
 ARG BUILD_NUMBER
 ARG PYTHON_SEMVER
-ARG $PYTHON_PYVER
+ARG PYTHON_PYVER
 ARG BUILD_SUFFIX
 ARG KLAYOUT_PYPI_LINK
+
+RUN printf "\
+WORKERS=$WORKERS\n\
+KLAYOUT_SEMVER=$KLAYOUT_SEMVER\n\
+BUILD_NUMBER=$BUILD_NUMBER\n\
+PYTHON_SEMVER=$PYTHON_SEMVER\n\
+PYTHON_PYVER=$PYTHON_PYVER\n\
+BUILD_SUFFIX=$BUILD_SUFFIX\n\
+KLAYOUT_PYPI_LINK=$KLAYOUT_PYPI_LINK\n\
+"
 
 RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 RUN apt-get update && apt-get install --no-install-recommends --yes \
@@ -19,7 +29,7 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools git \
     neovim xvfb htop rsync zip
 
-RUN mamba install -y python=$PYTHON_VERSION libpython-static conda-build anaconda-client
+RUN mamba install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
 RUN conda config --set anaconda_upload no
 
 # clone KLayout repo
