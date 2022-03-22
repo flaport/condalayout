@@ -1,13 +1,16 @@
 FROM condaforge/mambaforge
 
-ARG WORKERS
-ARG PYTHON_VERSION
-ARG KLAYOUT_VERSION
-ARG BUILD_NUMBER
-
 ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV LD_LIBRARY_PATH=/opt/conda/lib
+
+ARG WORKERS
+ARG KLAYOUT_SEMVER
+ARG BUILD_NUMBER
+ARG PYTHON_SEMVER
+RUN export PYTHON_PYVER = $(echo PYTHON_SEMVER | sed "s/\(^[0-9]\+\)\.\([0-9]\+\)\..*/\1\2/g") # 3.8.2 -> 38
+RUN export BUILD_SUFFIX = "$KLAYOUT_SEMVER-$PYTHON_PYVER_$BUILD_NUMBER"
+RUN export KLAYOUT_PYPI_LINK=$(cat /klayout-pypi-links.txt | grep manylinux | grep $KLAYOUT_SEMVER | grep $PYTHON_PYVER | head -1) && [ ! -z "$KLAYOUT_PYPI_LINK" ]
 
 RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 RUN apt-get update && apt-get install --no-install-recommends --yes \
@@ -18,43 +21,60 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
 
 RUN mamba install -y python=$PYTHON_VERSION libpython-static conda-build anaconda-client
 RUN conda config --set anaconda_upload no
-ADD canonical_name.py /canonical_name.py
-ADD meta.yaml /meta-template.yaml
 
-RUN git clone https://github.com/klayout/klayout --branch v$KLAYOUT_VERSION --depth 1
-WORKDIR klayout
+# clone KLayout repo
+RUN git clone https://github.com/klayout/klayout --branch v$KLAYOUT_SEMVER --depth 1 /klayout
+WORKDIR /klayout
 
+# run build
 RUN ./build.sh -j$WORKERS -noruby
 
-RUN mkdir -p klayout/bin klayout/lib && \
-    rsync -av bin-release/ klayout/lib/ && \
-    mv klayout/lib/klayout klayout/bin/ && \
-    mv klayout/lib/strm* klayout/bin/ && \
-    rsync -av klayout/ /opt/conda/
+# extract build
+RUN mkdir -p _klayout-gui/bin && \
+    mb bin-release _klayout-gui/lib && \
+    mv _klayout-gui/lib/klayout _klayout-gui/bin/ && \
+    mv _klayout-gui/lib/strm* _klayout-gui/bin/
 
 # klayout-gui.tar.bz2
 RUN mkdir /klayout/klayout-gui
-WORKDIR /klayout/klayout
-RUN tar -czf "/klayout/klayout-gui/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n $BUILD_NUMBER -e tar.gz)" *
+WORKDIR /klayout/_klayout-gui
+RUN tar -czf "/klayout/klayout-gui/klayout-gui-$BUILD_SUFFIX.tar.gz" *
 WORKDIR /klayout/klayout-gui
-RUN rm -rf /klayout/klayout
-RUN echo "#! /bin/sh\ntar -zxf \"\$RECIPE_DIR/$(python /canonical_name.py klayout-gui -v $KLAYOUT_VERSION -n $BUILD_NUMBER -e tar.gz)\" --directory=\"\$PREFIX\"" > build.sh
-RUN echo "{% set name = \"klayout-gui\" %}\n{% set version = \"$KLAYOUT_VERSION\" %}\n{% set python = \"py$(python -c 'import sys; print(f"{sys.version_info.major}{sys.version_info.minor}")')\" %}\n{% set build_number = \"$BUILD_NUMBER\" %}" > meta.yaml
+RUN rm -rf /klayout/_klayout-gui
+RUN printf "\
+#! /bin/sh\n\
+tar -zxf \"\$RECIPE_DIR/*.tar.gz\" --directory=\"\$PREFIX\"\n\
+" > build.sh
+RUN printf "\
+{% set name = \"klayout-gui\" %}\n\
+{% set version = \"$KLAYOUT_SEMVER\" %}\n\
+{% set build_number = \"$BUILD_NUMBER\" %}\n\
+{% set path = \"klayout-gui-$BUILD_SUFFIX.tar.gz\"}
+" > meta.yaml
+ADD meta-template.yaml /meta-template.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
 RUN conda build . && rm meta.yaml build.sh
 
 # klayout.tar.bz2
-RUN mkdir /klayout/klayout-py
-WORKDIR /klayout/klayout-py
-RUN echo "#! /bin/sh\npip install --no-deps https://files.pythonhosted.org/packages/2f/f6/3489ecf80db79a879f088a5abf40c48b7a9c6641114609376ae777859cf8/klayout-0.27.8-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl" > build.sh && cat build.sh
-RUN echo "{% set name = \"klayout\" %}\n{% set version = \"$KLAYOUT_VERSION\" %}\n{% set python = \"py$(python -c 'import sys; print(f"{sys.version_info.major}{sys.version_info.minor}")')\" %}\n{% set build_number = \"$BUILD_NUMBER\" %}" > meta.yaml
+RUN mkdir /klayout/klayout
+WORKDIR /klayout/klayout
+RUN printf "\
+#! /bin/sh\n\
+pip install --no-deps \"$KLAYOUT_PYPI_LINK\"\n\
+" > build.sh && cat build.sh
+RUN printf "\
+{% set name = \"klayout\" %}\n\
+{% set version = \"$KLAYOUT_SEMVER\" %}\n\
+{% set build_number = \"$BUILD_NUMBER\" %}\n\
+" > meta.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
 RUN conda build . && rm meta.yaml build.sh /meta-template.yaml
 
 # copy builds into dist
 RUN mkdir /klayout/dist
-RUN cp /opt/conda/conda-bld/linux-64/klayout-* /klayout/dist
+RUN cp /opt/conda/conda-bld/linux-64/klayout-*.tar.bz2 /klayout/dist && cp /klayout/klayout-gui/klayout-*.tar.gz /klayout/dist
+RUN conda install /klayout/dist/*.tar.bz2
 
 WORKDIR /root
-RUN echo 'Xvfb $DISPLAY &' >> /root/.bashrc
+RUN printf 'Xvfb $DISPLAY &' >> /root/.bashrc
 ENTRYPOINT ["bash"]

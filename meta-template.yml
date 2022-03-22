@@ -2,9 +2,9 @@ package:
   name: "{{ name|lower }}"
   version: "{{ version }}"
 
-{% if name == "klayout-gui" %}
+{% if path is defined %}
 source:
-  path: ./{{ name }}-{{ version }}-{{ python }}_{{ build_number }}.tar.gz
+  path: {{ path }}
 {% endif %}
 
 build:
