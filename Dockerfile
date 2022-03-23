@@ -53,13 +53,13 @@ WORKDIR /klayout/klayout-gui
 RUN rm -rf /klayout/_klayout-gui
 RUN printf "\
 #! /bin/sh\n\
-tar -zxf \"\$RECIPE_DIR/*.tar.gz\" --directory=\"\$PREFIX\"\n\
+tar -zxf \"\$RECIPE_DIR/klayout-gui-$BUILD_SUFFIX.tar.gz\" --directory=\"\$PREFIX\"\n\
 " > build.sh
 RUN printf "\
 {%% set name = \"klayout-gui\" %%}\n\
 {%% set version = \"$KLAYOUT_SEMVER\" %%}\n\
 {%% set build_number = \"$BUILD_NUMBER\" %%}\n\
-{%% set path = \"klayout-gui-$BUILD_SUFFIX.tar.gz\" %%}\n\
+{%% set path = \"./klayout-gui-$BUILD_SUFFIX.tar.gz\" %%}\n\
 " > meta.yaml
 ADD meta-template.yaml /meta-template.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
