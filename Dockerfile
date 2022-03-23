@@ -56,10 +56,10 @@ RUN printf "\
 tar -zxf \"\$RECIPE_DIR/*.tar.gz\" --directory=\"\$PREFIX\"\n\
 " > build.sh
 RUN printf "\
-{% set name = \"klayout-gui\" %}\n\
-{% set version = \"$KLAYOUT_SEMVER\" %}\n\
-{% set build_number = \"$BUILD_NUMBER\" %}\n\
-{% set path = \"klayout-gui-$BUILD_SUFFIX.tar.gz\"}\n\
+{%% set name = \"klayout-gui\" %%}\n\
+{%% set version = \"$KLAYOUT_SEMVER\" %%}\n\
+{%% set build_number = \"$BUILD_NUMBER\" %%}\n\
+{%% set path = \"klayout-gui-$BUILD_SUFFIX.tar.gz\" %%}\n\
 " > meta.yaml
 ADD meta-template.yaml /meta-template.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
@@ -73,9 +73,9 @@ RUN printf "\
 pip install --no-deps \"$KLAYOUT_PYPI_LINK\"\n\
 " > build.sh && cat build.sh
 RUN printf "\
-{% set name = \"klayout\" %}\n\
-{% set version = \"$KLAYOUT_SEMVER\" %}\n\
-{% set build_number = \"$BUILD_NUMBER\" %}\n\
+{%% set name = \"klayout\" %%}\n\
+{%% set version = \"$KLAYOUT_SEMVER\" %%}\n\
+{%% set build_number = \"$BUILD_NUMBER\" %%}\n\
 " > meta.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
 RUN conda build . && rm meta.yaml build.sh /meta-template.yaml
