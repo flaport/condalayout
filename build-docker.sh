@@ -4,9 +4,6 @@ export PYTHON_PYVER="$(echo "$PYTHON_SEMVER" | sed "s/\(^[0-9]\+\)\.\([0-9]\+\).
 export BUILD_SUFFIX="${KLAYOUT_SEMVER}-${PYTHON_PYVER}_${BUILD_NUMBER}"
 export KLAYOUT_PYPI_LINK="$(grep "manylinux" klayout-pypi-links.txt | grep "$KLAYOUT_SEMVER" | grep "cp$PYTHON_PYVER" | head -1)"
 
-echo $KLAYOUT_PYPI_LINK
-exit
-
 if [ -z "$KLAYOUT_PYPI_LINK" ]; then
   exit 1
 fi
