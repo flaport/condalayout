@@ -51,8 +51,8 @@ jobs:
         with:
           draft: false
           prerelease: false
-          release_name: KLayout v$KLAYOUT_SEMVER
-          tag_name: $KLAYOUT_SEMVER
+          release_name: KLayout v${{ env.KLAYOUT_SEMVER }}
+          tag_name: ${{ env.KLAYOUT_SEMVER }}
 
   release_py38:
     runs-on: ubuntu-latest
@@ -60,7 +60,7 @@ jobs:
       - docker_py38
       - release
     container:
-      image: flaport/condalayout:$KLAYOUT_SEMVER-py38_0
+      image: flaport/condalayout:${{ env.KLAYOUT_SEMVER }}-py38_0
     steps:
       - name: klayout-gui - add gzip tarball to release
         uses: actions/upload-release-asset@v1
@@ -68,8 +68,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-gui-$KLAYOUT_SEMVER-py38_0.tar.gz
-          asset_name: klayout-gui-$KLAYOUT_SEMVER-py38_0.tar.gz
+          asset_path: /klayout/dist/klayout-gui-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.gz
+          asset_name: klayout-gui-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.gz
           asset_content_type: application/x-gzip
       - name: klayout-gui - add bzip tarball to release
         uses: actions/upload-release-asset@v1
@@ -77,8 +77,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-gui-$KLAYOUT_SEMVER-py38_0.tar.bz2
-          asset_name: klayout-gui-$KLAYOUT_SEMVER-py38_0.tar.bz2
+          asset_path: /klayout/dist/klayout-gui-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.bz2
+          asset_name: klayout-gui-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.bz2
           asset_content_type: application/x-bzip2
       - name: klayout - add bzip tarball to release
         uses: actions/upload-release-asset@v1
@@ -86,15 +86,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-$KLAYOUT_SEMVER-py38_0.tar.bz2
-          asset_name: klayout-$KLAYOUT_SEMVER-py38_0.tar.bz2
+          asset_path: /klayout/dist/klayout-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.bz2
+          asset_name: klayout-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.bz2
           asset_content_type: application/x-bzip2
       - name: login to anaconda.org
         run: anaconda login --username '${{ secrets.ANACONDA_USER }}' --password '${{ secrets.ANACONDA_PASSWORD }}'
       - name: klayout-gui - upload to anaconda.org
-        run: anaconda upload /klayout/dist/klayout-gui-$KLAYOUT_SEMVER-py38_0.tar.bz2
+        run: anaconda upload /klayout/dist/klayout-gui-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.bz2
       - name: klayout - upload to anaconda.org
-        run: anaconda upload /klayout/dist/klayout-$KLAYOUT_SEMVER-py38_0.tar.bz2
+        run: anaconda upload /klayout/dist/klayout-${{ env.KLAYOUT_SEMVER }}-py38_0.tar.bz2
 
   release_py39:
     runs-on: ubuntu-latest
@@ -102,7 +102,7 @@ jobs:
       - docker_py39
       - release
     container:
-      image: flaport/condalayout:$KLAYOUT_SEMVER-py39_0
+      image: flaport/condalayout:${{ env.KLAYOUT_SEMVER }}-py39_0
     steps:
       - name: klayout-gui - add gzip tarball to release
         uses: actions/upload-release-asset@v1
@@ -110,8 +110,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-gui-$KLAYOUT_SEMVER-py39_0.tar.gz
-          asset_name: klayout-gui-$KLAYOUT_SEMVER-py39_0.tar.gz
+          asset_path: /klayout/dist/klayout-gui-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.gz
+          asset_name: klayout-gui-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.gz
           asset_content_type: application/x-gzip
       - name: klayout-gui - add bzip tarball to release
         uses: actions/upload-release-asset@v1
@@ -119,8 +119,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-gui-$KLAYOUT_SEMVER-py39_0.tar.bz2
-          asset_name: klayout-gui-$KLAYOUT_SEMVER-py39_0.tar.bz2
+          asset_path: /klayout/dist/klayout-gui-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.bz2
+          asset_name: klayout-gui-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.bz2
           asset_content_type: application/x-bzip2
       - name: klayout - add bzip tarball to release
         uses: actions/upload-release-asset@v1
@@ -128,12 +128,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /klayout/dist/klayout-$KLAYOUT_SEMVER-py39_0.tar.bz2
-          asset_name: klayout-$KLAYOUT_SEMVER-py39_0.tar.bz2
+          asset_path: /klayout/dist/klayout-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.bz2
+          asset_name: klayout-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.bz2
           asset_content_type: application/x-bzip2
       - name: login to anaconda.org
         run: anaconda login --username '${{ secrets.ANACONDA_USER }}' --password '${{ secrets.ANACONDA_PASSWORD }}'
       - name: klayout-gui - upload to anaconda.org
-        run: anaconda upload /klayout/dist/klayout-gui-$KLAYOUT_SEMVER-py39_0.tar.bz2
+        run: anaconda upload /klayout/dist/klayout-gui-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.bz2
       - name: klayout - upload to anaconda.org
-        run: anaconda upload /klayout/dist/klayout-$KLAYOUT_SEMVER-py39_0.tar.bz2
+        run: anaconda upload /klayout/dist/klayout-${{ env.KLAYOUT_SEMVER }}-py39_0.tar.bz2
