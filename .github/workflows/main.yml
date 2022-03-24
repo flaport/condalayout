@@ -41,6 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - docker_py38
+      - docker_py39
     steps:
       - name: create release
         uses: actions/create-release@v1
