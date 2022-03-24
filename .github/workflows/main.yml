@@ -7,6 +7,7 @@ on:
 env:
   WORKERS: 2
   BUILD_NUMBER: 0
+  KLAYOUT_SEMVER: ${{ github.ref_name }}
 
 jobs:
   docker:
