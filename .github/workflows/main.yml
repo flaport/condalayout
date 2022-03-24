@@ -1,12 +1,8 @@
 name: main
 on:
-# push:
-#   tags:
-#     - '[0-9]+\.[0-9]+\.[0-9]'
   push:
-    branches:
-      - master
-
+    tags:
+      - '[0-9]+\.[0-9]+\.[0-9]'
 
 env:
   WORKERS: 2
@@ -19,79 +15,75 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        PYTHON_SEMVER: ['3.8', '3.9']
+        PYTHON_SEMVER: ["3.8", "3.9"]
     steps:
-      - run: echo ${{ matrix.PYTHON_SEMVER }}
-#     - name: checkout
-#       uses: actions/checkout@v1
-#     - name: login to dockerhub registry
-#       run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
-#     - name: build or pull docker image using git tag
-#       env:
-#         PYTHON_SEMVER: 3.8
-#       run: ./build-docker.sh
+      - name: checkout
+        uses: actions/checkout@v1
+      - name: login to dockerhub registry
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
+      - name: build or pull docker image using git tag
+        env:
+          PYTHON_SEMVER: ${{ matrix.PYTHON_SEMVER }}
+        run: ./build-docker.sh
 
-# release:
-#   runs-on: ubuntu-latest
-#   needs:
-#     - docker_py38
-#     - docker_py39
-#   steps:
-#     - name: create release
-#       uses: actions/create-release@v1
-#       id: create_release
-#       env:
-#         GITHUB_TOKEN: ${{ github.token }}
-#       with:
-#         draft: false
-#         prerelease: false
-#         release_name: KLayout v${{ github.ref_name }}
-#         tag_name: ${{ github.ref_name }}
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - docker
+    steps:
+      - name: create release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          draft: false
+          prerelease: false
+          release_name: KLayout v${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
 
   release_add:
     runs-on: ubuntu-latest
     needs:
       - docker
-#     - release
+      - release
     strategy:
       fail-fast: true
       matrix:
-        PYTHON_PYVER: ['38', '39']
-#   container:
-#     image: flaport/condalayout:${{ github.ref_name }}-py38_0
+        PYTHON_PYVER: ["38", "39"]
+    container:
+      image: flaport/condalayout:${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0
     steps:
-      - run: echo ${{ matrix.PYTHON_PYVER }}
-#     - name: klayout-gui - add gzip tarball to release
-#       uses: actions/upload-release-asset@v1
-#       env:
-#         GITHUB_TOKEN: ${{ github.token }}
-#       with:
-#         upload_url: ${{ steps.create_release.outputs.upload_url }}
-#         asset_path: /klayout/dist/klayout-gui-${{ github.ref_name }}-py38_0.tar.gz
-#         asset_name: klayout-gui-${{ github.ref_name }}-py38_0.tar.gz
-#         asset_content_type: application/x-gzip
-#     - name: klayout-gui - add bzip tarball to release
-#       uses: actions/upload-release-asset@v1
-#       env:
-#         GITHUB_TOKEN: ${{ github.token }}
-#       with:
-#         upload_url: ${{ steps.create_release.outputs.upload_url }}
-#         asset_path: /klayout/dist/klayout-gui-${{ github.ref_name }}-py38_0.tar.bz2
-#         asset_name: klayout-gui-${{ github.ref_name }}-py38_0.tar.bz2
-#         asset_content_type: application/x-bzip2
-#     - name: klayout - add bzip tarball to release
-#       uses: actions/upload-release-asset@v1
-#       env:
-#         GITHUB_TOKEN: ${{ github.token }}
-#       with:
-#         upload_url: ${{ steps.create_release.outputs.upload_url }}
-#         asset_path: /klayout/dist/klayout-${{ github.ref_name }}-py38_0.tar.bz2
-#         asset_name: klayout-${{ github.ref_name }}-py38_0.tar.bz2
-#         asset_content_type: application/x-bzip2
-#     - name: login to anaconda.org
-#       run: anaconda login --username '${{ secrets.ANACONDA_USER }}' --password '${{ secrets.ANACONDA_PASSWORD }}'
-#     - name: klayout-gui - upload to anaconda.org
-#       run: anaconda upload /klayout/dist/klayout-gui-${{ github.ref_name }}-py38_0.tar.bz2
-#     - name: klayout - upload to anaconda.org
-#       run: anaconda upload /klayout/dist/klayout-${{ github.ref_name }}-py38_0.tar.bz2
-
+      - name: klayout-gui - add gzip tarball to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /klayout/dist/klayout-gui-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.gz
+          asset_name: klayout-gui-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.gz
+          asset_content_type: application/x-gzip
+      - name: klayout-gui - add bzip tarball to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /klayout/dist/klayout-gui-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.bz2
+          asset_name: klayout-gui-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.bz2
+          asset_content_type: application/x-bzip2
+      - name: klayout - add bzip tarball to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /klayout/dist/klayout-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.bz2
+          asset_name: klayout-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.bz2
+          asset_content_type: application/x-bzip2
+      - name: login to anaconda.org
+        run: anaconda login --username '${{ secrets.ANACONDA_USER }}' --password '${{ secrets.ANACONDA_PASSWORD }}'
+      - name: klayout-gui - upload to anaconda.org
+        run: anaconda upload /klayout/dist/klayout-gui-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.bz2
+      - name: klayout - upload to anaconda.org
+        run: anaconda upload /klayout/dist/klayout-${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0.tar.bz2
