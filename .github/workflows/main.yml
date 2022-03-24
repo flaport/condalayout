@@ -13,11 +13,15 @@ env:
   BUILD_NUMBER: 0
 
 jobs:
-  docker_py38:
+  docker:
     runs-on: ubuntu-latest
     timeout-minutes: 14400
+    strategy:
+      fail-fast: true
+      matrix:
+        PYTHON_SEMVER: ['3.8', '3.9']
     steps:
-      - run: echo docker_py38
+      - run: echo ${{ matrix.PYTHON_SEMVER }}
 #     - name: checkout
 #       uses: actions/checkout@v1
 #     - name: login to dockerhub registry
@@ -25,20 +29,6 @@ jobs:
 #     - name: build or pull docker image using git tag
 #       env:
 #         PYTHON_SEMVER: 3.8
-#       run: ./build-docker.sh
-
-  docker_py39:
-    runs-on: ubuntu-latest
-    timeout-minutes: 14400
-    steps:
-      - run: echo docker_py39
-#     - name: checkout
-#       uses: actions/checkout@v1
-#     - name: login to dockerhub registry
-#       run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
-#     - name: build or pull docker image using git tag
-#       env:
-#         PYTHON_SEMVER: 3.9
 #       run: ./build-docker.sh
 
 # release:
@@ -58,15 +48,19 @@ jobs:
 #         release_name: KLayout v${{ github.ref_name }}
 #         tag_name: ${{ github.ref_name }}
 
-  release_py38:
+  release_add:
     runs-on: ubuntu-latest
     needs:
-      - docker_py38
+      - docker
 #     - release
-    container:
-      image: flaport/condalayout:${{ github.ref_name }}-py38_0
+    strategy:
+      fail-fast: true
+      matrix:
+        PYTHON_PYVER: ['38', '39']
+#   container:
+#     image: flaport/condalayout:${{ github.ref_name }}-py38_0
     steps:
-      - run: echo release_py38
+      - run: echo ${{ matrix.PYTHON_PYVER }}
 #     - name: klayout-gui - add gzip tarball to release
 #       uses: actions/upload-release-asset@v1
 #       env:
@@ -101,45 +95,3 @@ jobs:
 #     - name: klayout - upload to anaconda.org
 #       run: anaconda upload /klayout/dist/klayout-${{ github.ref_name }}-py38_0.tar.bz2
 
-  release_py39:
-    runs-on: ubuntu-latest
-    needs:
-      - docker_py39
-#     - release
-    container:
-      image: flaport/condalayout:${{ github.ref_name }}-py39_0
-    steps:
-      - run: echo release_py39
-#     - name: klayout-gui - add gzip tarball to release
-#       uses: actions/upload-release-asset@v1
-#       env:
-#         GITHUB_TOKEN: ${{ github.token }}
-#       with:
-#         upload_url: ${{ steps.create_release.outputs.upload_url }}
-#         asset_path: /klayout/dist/klayout-gui-${{ github.ref_name }}-py39_0.tar.gz
-#         asset_name: klayout-gui-${{ github.ref_name }}-py39_0.tar.gz
-#         asset_content_type: application/x-gzip
-#     - name: klayout-gui - add bzip tarball to release
-#       uses: actions/upload-release-asset@v1
-#       env:
-#         GITHUB_TOKEN: ${{ github.token }}
-#       with:
-#         upload_url: ${{ steps.create_release.outputs.upload_url }}
-#         asset_path: /klayout/dist/klayout-gui-${{ github.ref_name }}-py39_0.tar.bz2
-#         asset_name: klayout-gui-${{ github.ref_name }}-py39_0.tar.bz2
-#         asset_content_type: application/x-bzip2
-#     - name: klayout - add bzip tarball to release
-#       uses: actions/upload-release-asset@v1
-#       env:
-#         GITHUB_TOKEN: ${{ github.token }}
-#       with:
-#         upload_url: ${{ steps.create_release.outputs.upload_url }}
-#         asset_path: /klayout/dist/klayout-${{ github.ref_name }}-py39_0.tar.bz2
-#         asset_name: klayout-${{ github.ref_name }}-py39_0.tar.bz2
-#         asset_content_type: application/x-bzip2
-#     - name: login to anaconda.org
-#       run: anaconda login --username '${{ secrets.ANACONDA_USER }}' --password '${{ secrets.ANACONDA_PASSWORD }}'
-#     - name: klayout-gui - upload to anaconda.org
-#       run: anaconda upload /klayout/dist/klayout-gui-${{ github.ref_name }}-py39_0.tar.bz2
-#     - name: klayout - upload to anaconda.org
-#       run: anaconda upload /klayout/dist/klayout-${{ github.ref_name }}-py39_0.tar.bz2
