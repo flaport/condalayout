@@ -4,8 +4,14 @@ on:
     tags:
       - '[0-9]+\.[0-9]+\.[0-9]'
 
-jobs:
 
+env:
+  WORKERS: 2
+  PYTHON_SEMVER: 3.8
+  BUILD_NUMBER: 0
+  KLAYOUT_SEMVER: ${{ github.ref_name }}
+
+jobs:
   docker:
     runs-on: ubuntu-latest
     timeout-minutes: 14400
@@ -15,28 +21,7 @@ jobs:
       - name: login to dockerhub registry
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USER }} --password-stdin
       - name: build or pull docker image using git tag
-        run: |
-          if ! docker pull flaport/condalayout:${{ github.ref_name}} > /dev/null 2> /dev/null; then
-            export WORKERS=2;
-            export PYTHON_SEMVER=3.8;
-            export KLAYOUT_SEMVER=${{ github.ref_name }};
-            export BUILD_NUMBER=0;
-            export PYTHON_PYVER="$(echo "$PYTHON_SEMVER" | sed "s/\(^[0-9]\+\)\.\([0-9]\+\).*/\1\2/g")";
-            export BUILD_SUFFIX="$KLAYOUT_SEMVER-$PYTHON_PYVER_$BUILD_NUMBER";
-            export KLAYOUT_PYPI_LINK="$(cat klayout-pypi-links.txt | grep manylinux | grep $KLAYOUT_SEMVER | grep $PYTHON_PYVER | head -1)" && [ ! -z "$KLAYOUT_PYPI_LINK" ];
-            docker build . -t flaport/condalayout:$KLAYOUT_SEMVER \
-              --build-arg WORKERS=$WORKERS \
-              --build-arg PYTHON_SEMVER=$PYTHON_SEMVER \
-              --build-arg KLAYOUT_SEMVER=$KLAYOUT_SEMVER \
-              --build-arg BUILD_NUMBER=$BUILD_NUMBER \
-              --build-arg PYTHON_PYVER=$PYTHON_PYVER \
-              --build-arg BUILD_SUFFIX=$BUILD_SUFFIX \
-              --build-arg KLAYOUT_PYPI_LINK=$KLAYOUT_PYPI_LINK;
-          fi
-      - name: tag docker image as latest
-        run: docker tag flaport/condalayout:${{ github.ref_name }} flaport/condalayout:latest
-      - name: push docker image
-        run: docker push flaport/condalayout:latest && docker push flaport/condalayout:${{ github.ref_name }}
+        run: ./build-docker.sh
 
   release:
     runs-on: ubuntu-latest
