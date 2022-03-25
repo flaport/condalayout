@@ -4,22 +4,22 @@ ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV LD_LIBRARY_PATH=/opt/conda/lib
 
+ARG WORKERS
+ARG KLAYOUT_SEMVER
 ARG BUILD_NUMBER
+ARG PYTHON_SEMVER
+ARG PYTHON_PYVER
 ARG BUILD_SUFFIX
 ARG KLAYOUT_PYPI_LINK
-ARG KLAYOUT_SEMVER
-ARG PYTHON_PYVER
-ARG PYTHON_SEMVER
-ARG WORKERS
 
 RUN printf "\
+WORKERS=$WORKERS\n\
+KLAYOUT_SEMVER=$KLAYOUT_SEMVER\n\
 BUILD_NUMBER=$BUILD_NUMBER\n\
+PYTHON_SEMVER=$PYTHON_SEMVER\n\
+PYTHON_PYVER=$PYTHON_PYVER\n\
 BUILD_SUFFIX=$BUILD_SUFFIX\n\
 KLAYOUT_PYPI_LINK=$KLAYOUT_PYPI_LINK\n\
-KLAYOUT_SEMVER=$KLAYOUT_SEMVER\n\
-PYTHON_PYVER=$PYTHON_PYVER\n\
-PYTHON_SEMVER=$PYTHON_SEMVER\n\
-WORKERS=$WORKERS\n\
 "
 
 RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
@@ -40,26 +40,23 @@ WORKDIR /klayout
 RUN ./build.sh -j$WORKERS -noruby
 
 # extract build
-RUN mkdir -p _klayout-gui/bin && \
-    mv bin-release _klayout-gui/lib && \
-    mv _klayout-gui/lib/klayout _klayout-gui/bin/ && \
-    mv _klayout-gui/lib/strm* _klayout-gui/bin/
+RUN mkdir -p klayout-gui/bin && \
+    mv bin-release klayout-gui/lib && \
+    mv klayout-gui/lib/klayout klayout-gui/bin/ && \
+    mv klayout-gui/lib/strm* klayout-gui/bin/
 
 # klayout-gui.tar.bz2
-RUN mkdir /klayout/klayout-gui
-WORKDIR /klayout/_klayout-gui
-RUN tar -czf "/klayout/klayout-gui/klayout-gui-$BUILD_SUFFIX.tar.gz" *
+RUN mkdir /klayout/dist
 WORKDIR /klayout/klayout-gui
-RUN rm -rf /klayout/_klayout-gui
+RUN tar -czf "/klayout/dist/klayout-gui-$BUILD_SUFFIX.tar.gz" * && rm -rf *
 RUN printf "\
 #! /bin/sh\n\
-tar -zxf \"\$RECIPE_DIR/klayout-gui-$BUILD_SUFFIX.tar.gz\" --directory=\"\$PREFIX\"\n\
+tar -zxf \"/klayout/dist/klayout-gui-$BUILD_SUFFIX.tar.gz\" --directory=\"\$PREFIX\"\n\
 " > build.sh
 RUN printf "\
 {%% set name = \"klayout-gui\" %%}\n\
 {%% set version = \"$KLAYOUT_SEMVER\" %%}\n\
 {%% set build_number = \"$BUILD_NUMBER\" %%}\n\
-{%% set path = \"./klayout-gui-$BUILD_SUFFIX.tar.gz\" %%}\n\
 " > meta.yaml
 ADD meta-template.yaml /meta-template.yaml
 RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
@@ -81,8 +78,7 @@ RUN cat /meta-template.yaml >> meta.yaml && cat meta.yaml
 RUN conda build . && rm meta.yaml build.sh /meta-template.yaml
 
 # copy builds into dist
-RUN mkdir /klayout/dist
-RUN cp /opt/conda/conda-bld/linux-64/klayout-*.tar.bz2 /klayout/dist && cp /klayout/klayout-gui/klayout-*.tar.gz /klayout/dist
+RUN cp /opt/conda/conda-bld/linux-64/klayout-*.tar.bz2 /klayout/dist && cp /klayout/dist/klayout-*.tar.gz /klayout/dist
 RUN conda install /klayout/dist/*.tar.bz2
 
 WORKDIR /root
