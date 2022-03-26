@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools git \
     neovim xvfb htop rsync zip
 
-RUN mamba update base && mamba install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
+RUN mamba install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
 RUN conda config --set anaconda_upload no
 
 # clone KLayout repo
