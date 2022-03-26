@@ -1,4 +1,4 @@
-FROM condaforge/mambaforge:4.11.0-4
+FROM condaforge/mambaforge:4.11.0-0
 
 ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
