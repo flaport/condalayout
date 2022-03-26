@@ -1,4 +1,4 @@
-FROM condaforge/mambaforge:4.11.0-2
+FROM condaforge/mambaforge:4.11.0-4
 
 ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools git \
     neovim xvfb htop rsync zip
 
-RUN mamba install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
+RUN mamba update base && mamba install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
 RUN conda config --set anaconda_upload no
 
 # clone KLayout repo
