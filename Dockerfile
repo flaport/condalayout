@@ -1,8 +1,9 @@
-FROM condaforge/mambaforge:4.11.0-0
-
+FROM ubuntu:focal-20220105
+ENV CONDA_DIR=/opt/conda
 ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV LD_LIBRARY_PATH=/opt/conda/lib
+ENV PATH=${CONDA_DIR}/bin:${PATH}
 
 ARG BUILD_NUMBER
 ARG BUILD_SUFFIX
@@ -22,14 +23,26 @@ PYTHON_SEMVER=$PYTHON_SEMVER\n\
 WORKERS=$WORKERS\n\
 "
 
-RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-RUN apt-get update && apt-get install --no-install-recommends --yes \
+RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
+    apt-get update && apt-get install --no-install-recommends --yes \
     build-essential zlib1g-dev qt5-default qt5-qmake libqt5svg5-dev \
     qtbase5-dev qttools5-dev qttools5-dev libqt5xmlpatterns5-dev \
     qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools git \
-    neovim xvfb htop rsync zip
+    neovim xvfb htop rsync zip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN mamba install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
+
+RUN curl -L https://github.com/conda-forge/miniforge/releases/download/4.11.0-4/Mambaforge-Linux-x86_64.sh --output /tmp/mambaforge.sh --silent && \
+  /bin/bash /tmp/mambaforge.sh -b -p ${CONDA_DIR} && \
+  rm /tmp/mambaforge.sh && \
+  conda clean -tipsy && \
+  find ${CONDA_DIR} -follow -type f -name '*.a' -delete && \
+  find ${CONDA_DIR} -follow -type f -name '*.pyc' -delete && \
+  conda clean -afy && \
+  echo "source ${CONDA_DIR}/etc/profile.d/conda.sh && conda activate base" >> ${HOME}/.bashrc && \
+  echo 'Xvfb $DISPLAY &' >> ${HOME}/.bashrc
+
+RUN conda install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
 RUN conda config --set anaconda_upload no
 
 # clone KLayout repo
@@ -86,5 +99,4 @@ RUN cp /opt/conda/conda-bld/linux-64/klayout-*.tar.bz2 /klayout/dist && cp /klay
 RUN conda install /klayout/dist/*.tar.bz2
 
 WORKDIR /root
-RUN printf 'Xvfb $DISPLAY &' >> /root/.bashrc
 ENTRYPOINT ["bash"]
