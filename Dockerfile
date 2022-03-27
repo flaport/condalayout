@@ -25,12 +25,31 @@ WORKERS=$WORKERS\n\
 
 RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
     apt-get update && apt-get install --no-install-recommends --yes \
-    build-essential zlib1g-dev qt5-default qt5-qmake libqt5svg5-dev \
-    qtbase5-dev qttools5-dev qttools5-dev libqt5xmlpatterns5-dev \
-    qtxmlpatterns5-dev-tools qtmultimedia5-dev ccache qtltools git \
-    neovim xvfb htop rsync zip && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
+    build-essential \
+    bzip2 \
+    ca-certificates \
+    ccache \
+    curl \
+    git \
+    htop \
+    htop \
+    libqt5svg5-dev \
+    libqt5xmlpatterns5-dev \
+    neovim \
+    neovim \
+    openssh-client \
+    patch \
+    qt5-default \
+    qt5-qmake \
+    qtbase5-dev \
+    qtltools \
+    qtmultimedia5-dev \
+    qttools5-dev \
+    qtxmlpatterns5-dev-tools \
+    rsync \
+    xvfb \
+    zip \
+    zlib1g-dev
 
 RUN curl -L https://github.com/conda-forge/miniforge/releases/download/4.11.0-4/Mambaforge-Linux-x86_64.sh --output /tmp/mambaforge.sh --silent && \
   /bin/bash /tmp/mambaforge.sh -b -p ${CONDA_DIR} && \
