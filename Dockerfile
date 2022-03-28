@@ -4,8 +4,8 @@ ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV LD_LIBRARY_PATH=/opt/conda/lib
 ENV PATH=${CONDA_DIR}/bin:${PATH}
+ENV LFLAGS=-fno-lto
 ENV LDFLAGS=-fno-lto
-ENV QMAKE_LDFLAGS=-fno-lto
 
 ARG BUILD_NUMBER
 ARG BUILD_SUFFIX
@@ -63,7 +63,7 @@ RUN curl -L https://github.com/conda-forge/miniforge/releases/download/4.11.0-4/
   echo "source ${CONDA_DIR}/etc/profile.d/conda.sh && conda activate base" >> ${HOME}/.bashrc && \
   echo 'Xvfb $DISPLAY &' >> ${HOME}/.bashrc
 
-RUN conda install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client
+RUN conda install -y python=$PYTHON_SEMVER libpython-static conda-build anaconda-client importlib_resources=5.4.0 jinja2=3.0 setuptools=60
 RUN conda config --set anaconda_upload no
 
 # clone KLayout repo
