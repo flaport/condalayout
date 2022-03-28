@@ -22,7 +22,7 @@ jobs:
           BUILD_NUMBER: 0
           KLAYOUT_SEMVER: ${{ github.ref_name }}
           PYTHON_SEMVER: ${{ matrix.PYTHON_SEMVER }}
-          WORKERS: 2
+          WORKERS: 1
         run: ./build-docker.sh
 
   release:
