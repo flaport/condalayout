@@ -4,10 +4,10 @@ ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV LD_LIBRARY_PATH=/opt/conda/lib
 ENV PATH=${CONDA_DIR}/bin:${PATH}
-ENV LFLAGS=-fno-lto
-ENV LDFLAGS=-fno-lto
-ENV QMAKE_LFLAGS=-fno-lto
-ENV QMAKE_LDFLAGS=-fno-lto
+ENV LFLAGS="-fno-lto -lavdevice"
+ENV LDFLAGS="-fno-lto -lavdevice"
+ENV QMAKE_LFLAGS="-fno-lto -lavdevice"
+ENV QMAKE_LDFLAGS="-fno-lto -lavdevice"
 ENV LD=/opt/conda/bin/gcc
 ENV CC=/opt/conda/bin/gcc
 ENV CXX=/opt/conda/bin/g++
