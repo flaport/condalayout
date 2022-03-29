@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PYTHON_SEMVER: ["3.9"]
+        PYTHON_SEMVER: ["3.8", "3.9"]
     steps:
       - name: checkout
         uses: actions/checkout@v1
@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        PYTHON_PYVER: ["39"]
+        PYTHON_PYVER: ["38", "39"]
     container:
       image: flaport/condalayout:${{ github.ref_name }}-py${{ matrix.PYTHON_PYVER }}_0
     steps:
