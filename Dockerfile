@@ -4,13 +4,13 @@ ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV LD_LIBRARY_PATH=/opt/conda/lib
 ENV PATH=${CONDA_DIR}/bin:${PATH}
-ENV LFLAGS="-fno-lto -lavdevice"
-ENV LDFLAGS="-fno-lto -lavdevice"
-ENV QMAKE_LFLAGS="-fno-lto -lavdevice"
-ENV QMAKE_LDFLAGS="-fno-lto -lavdevice"
-ENV LD=/opt/conda/bin/gcc
-ENV CC=/opt/conda/bin/gcc
-ENV CXX=/opt/conda/bin/g++
+# ENV LFLAGS="-fno-lto -lavdevice"
+# ENV LDFLAGS="-fno-lto -lavdevice"
+# ENV QMAKE_LFLAGS="-fno-lto -lavdevice"
+# ENV QMAKE_LDFLAGS="-fno-lto -lavdevice"
+ENV LD=clang
+ENV CC=clang
+ENV CXX=clang++
 
 ARG BUILD_NUMBER
 ARG BUILD_SUFFIX
@@ -36,6 +36,7 @@ RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
     bzip2 \
     ca-certificates \
     ccache \
+    clang \
     curl \
     git \
     htop \
@@ -76,8 +77,7 @@ RUN conda install -y \
     importlib_resources=5.4.0 \
     jinja2=3.0 \
     setuptools=60 \
-    gcc \
-    gxx
+
 RUN conda config --set anaconda_upload no
 
 # clone KLayout repo
