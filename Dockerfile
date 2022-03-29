@@ -76,7 +76,7 @@ RUN conda install -y \
     anaconda-client \
     importlib_resources=5.4.0 \
     jinja2=3.0 \
-    setuptools=60 \
+    setuptools=60
 
 RUN conda config --set anaconda_upload no
 
