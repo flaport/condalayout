@@ -1,16 +1,14 @@
-FROM ubuntu:focal-20220105
+FROM ubuntu:22.04
 ENV CONDA_DIR=/opt/conda
 ENV DISPLAY=:0
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV LD_LIBRARY_PATH=/opt/conda/lib
 ENV PATH=${CONDA_DIR}/bin:${PATH}
-# ENV LFLAGS="-fno-lto -lavdevice"
-# ENV LDFLAGS="-fno-lto -lavdevice"
-# ENV QMAKE_LFLAGS="-fno-lto -lavdevice"
-# ENV QMAKE_LDFLAGS="-fno-lto -lavdevice"
-ENV LD=clang
-ENV CC=clang
-ENV CXX=clang++
+ENV LFLAGS="-fno-lto -lavdevice"
+ENV LDFLAGS="-fno-lto -lavdevice"
+ENV QMAKE_LFLAGS="-fno-lto -lavdevice"
+ENV QMAKE_LDFLAGS="-fno-lto -lavdevice"
+ENV DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_NUMBER
 ARG BUILD_SUFFIX
@@ -31,26 +29,18 @@ WORKERS=$WORKERS\n\
 "
 
 RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
-    apt-get update && apt-get install --no-install-recommends --yes \
+    apt-get update && apt-get install --force-yes --no-install-recommends --yes \
     build-essential \
-    bzip2 \
     ca-certificates \
     ccache \
-    clang \
     curl \
     git \
-    htop \
-    htop \
     libqt5svg5-dev \
     libqt5xmlpatterns5-dev \
-    neovim \
-    neovim \
-    openssh-client \
-    patch \
-    qt5-default \
     qt5-qmake \
     qtbase5-dev \
-    qtltools \
+    qtbase5-dev-tools \
+    qtchooser \
     qtmultimedia5-dev \
     qttools5-dev \
     qtxmlpatterns5-dev-tools \
