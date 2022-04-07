@@ -9,7 +9,7 @@ dist: docker
 
 docker39:
 	docker build . -t flaport/condalayout:0.27.8-py39_0 \
-		--build-arg WORKERS=1 \
+		--build-arg WORKERS=8 \
 		--build-arg PYTHON_SEMVER=3.9 \
 		--build-arg KLAYOUT_SEMVER=0.27.8 \
 		--build-arg BUILD_NUMBER=0 \
@@ -19,7 +19,7 @@ docker39:
 
 docker38:
 	docker build . -t flaport/condalayout:0.27.8-py38_0 \
-		--build-arg WORKERS=1 \
+		--build-arg WORKERS=8 \
 		--build-arg PYTHON_SEMVER=3.8 \
 		--build-arg KLAYOUT_SEMVER=0.27.8 \
 		--build-arg BUILD_NUMBER=0 \
